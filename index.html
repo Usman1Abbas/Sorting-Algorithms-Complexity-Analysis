@@ -1,0 +1,398 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Algorithms Comparison</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   
+    <style>
+        /* Root Variables for Easy Theming */
+        :root {
+            --font-primary: 'Poppins', sans-serif;
+            --color-bg: #f5f7fa;
+            --color-bg-secondary: #ffffff;
+            --color-text: #34495e;
+            --color-text-heading: #2c3e50;
+            --color-primary: #1abc9c;
+            --color-primary-hover: #16a085;
+            --color-border: #bdc3c7;
+            --color-highlight: #3498db;
+            --color-hover-bg: #d0e5f2;
+            --color-decorative: rgba(26, 188, 156, 0.1);
+            --transition-speed: 0.3s;
+            --border-radius: 12px;
+            --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            --max-width: 1100px;
+            --spacing: 20px;
+        }
+
+        /* Dark Mode Variables */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-bg: #2c3e50;
+                --color-bg-secondary: #34495e;
+                --color-text: #ecf0f1;
+                --color-text-heading: #ecf0f1;
+                --color-primary: #16a085;
+                --color-primary-hover: #1abc9c;
+                --color-border: #7f8c8d;
+                --color-highlight: #2980b9;
+                --color-hover-bg: #1a5276;
+                --color-decorative: rgba(26, 188, 156, 0.2);
+            }
+        }
+
+        /* Global Styling */
+        body {
+            font-family: var(--font-primary);
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: var(--spacing);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--color-text-heading);
+            margin-bottom: 2.5rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        /* Utility Classes */
+        .container {
+            width: 100%;
+            padding: 0 var(--spacing);
+            box-sizing: border-box;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mt-30 {
+            margin-top: 30px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .p-20 {
+            padding: 20px;
+        }
+
+        .rounded {
+            border-radius: var(--border-radius);
+        }
+
+        .shadow {
+            box-shadow: var(--box-shadow);
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing);
+            box-shadow: var(--box-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            position: relative;
+            transition: background-color var(--transition-speed);
+        }
+
+        .control-panel::before, .control-panel::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background-color: var(--color-decorative);
+            border-radius: 50%;
+            z-index: -1;
+            transition: background-color var(--transition-speed);
+        }
+
+        .control-panel::before {
+            top: -30px;
+            left: -30px;
+        }
+
+        .control-panel::after {
+            bottom: -30px;
+            right: -30px;
+        }
+
+        .control-panel:hover::before,
+        .control-panel:hover::after {
+            background-color: var(--color-primary-hover);
+        }
+
+        /* Form Elements */
+        select, input, button {
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--color-border);
+            font-size: 16px;
+            transition: all var(--transition-speed) ease;
+            font-family: var(--font-primary);
+        }
+
+        select, input {
+            width: 220px;
+            color: var(--color-text);
+            background-color: transparent;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--color-primary);
+            outline: none;
+            box-shadow: 0 0 5px var(--color-primary);
+        }
+
+        button {
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            padding: 12px 30px;
+            transition: background-color var(--transition-speed), transform 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--color-primary-hover);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:focus {
+            outline: 2px solid var(--color-highlight);
+        }
+
+        /* Results & Plot Section */
+        #results, #plot {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing);
+            box-shadow: var(--box-shadow);
+            margin-top: 30px;
+            transition: background-color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        #results h2, #results h3 {
+            color: var(--color-text-heading);
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        #results ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #results li {
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            background-color: #62cfba;
+            border-left: 4px solid var(--color-highlight);
+            border-radius: 4px;
+            transition: background-color var(--transition-speed), transform 0.2s;
+            cursor: pointer;
+        }
+
+        #results li:hover {
+            background-color: var(--color-hover-bg);
+            transform: translateX(5px);
+        }
+
+        #results li:focus {
+            outline: 2px solid var(--color-highlight);
+            background-color: var(--color-hover-bg);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--color-text-heading);
+        }
+
+        .loading::after {
+            content: "Loading";
+            display: inline-block;
+            animation: ellipsis 1.5s infinite;
+        }
+
+        @keyframes ellipsis {
+            0% { content: "Loading"; }
+            25% { content: "Loading."; }
+            50% { content: "Loading.."; }
+            75% { content: "Loading..."; }
+        }
+
+        /* Minimalist Decorative Elements Enhanced */
+        .control-panel::before, .control-panel::after {
+            background-color: var(--color-decorative);
+            transition: background-color var(--transition-speed);
+        }
+
+        /* Responsive Enhancements */
+        @media(max-width: 1024px) {
+            .control-panel {
+                justify-content: center;
+            }
+
+            select, input, button {
+                width: 100%;
+            }
+
+            #results, #plot {
+                padding: 15px;
+            }
+        }
+
+        @media(max-width: 768px) {
+            .control-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .control-panel::before, .control-panel::after {
+                display: none;
+            }
+        }
+
+        @media(max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .loading {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Sorting Algorithms Comparison</h1>
+    
+    <div class="container">
+        <form id="sortForm" class="control-panel">
+            <div>
+                <label for="algorithm">Choose a Sorting Algorithm:</label>
+                <select style="background-color: #34495e;" id="algorithm" name="algorithm">
+                    <option value="Bubble Sort">Bubble Sort</option>
+                    <option value="Insertion Sort">Insertion Sort</option>
+                    <option value="Selection Sort">Selection Sort</option>
+                    <option value="Merge Sort">Merge Sort</option>
+                    <option value="Quick Sort">Quick Sort</option>
+                    <option value="Heap Sort">Heap Sort</option>
+                    <option value="Counting Sort">Counting Sort</option>
+                    <option value="Radix Sort">Radix Sort</option>
+                    <option value="Bucket Sort">Bucket Sort</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="arraySize">Array Size:</label>
+                <input type="number" id="arraySize" name="arraySize" min="10" max="100000" value="50">
+            </div>
+
+            <button type="submit">Compare</button>
+        </form>
+
+        <div id="results" class="mt-30">
+            <h2>Comparison Results</h2>
+            <ul></ul>
+        </div>
+
+        <div id="plot" class="mt-30">
+            <h3>Performance Plot</h3>
+            <div id="performanceChart"></div>
+        </div>
+        
+        <div class="loading">Loading</div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            let results = {};
+            
+            $('#sortForm').submit(function(e) {
+                e.preventDefault();
+                const algorithm = $('#algorithm').val();
+                const arraySize = $('#arraySize').val();
+                $('.loading').show();
+
+                $.post('/run_algorithm', { algorithm: algorithm, array_size: arraySize }, function(data) {
+                    if (!results[algorithm]) {
+                        results[algorithm] = [];
+                    }
+                    results[algorithm].push(data);
+                    updateResults();
+                    updatePlot();
+                    $('.loading').hide();
+                });
+            });
+
+            function updateResults() {
+                let html = '';
+                for (const [algorithm, data] of Object.entries(results)) {
+                    html += `<h3>${algorithm}</h3><ul>`;
+                    data.forEach(point => {
+                        html += `<li>Array size: ${point.array_size}, Time: ${point.time.toFixed(6)} ms</li>`;
+                    });
+                    html += '</ul>';
+                }
+                $('#results ul').html(html);
+            }
+
+            function updatePlot() {
+                $.ajax({
+                    url: '/plot_results',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(results),
+                    success: function(response) {
+                        const figure = JSON.parse(response);
+                        Plotly.newPlot('performanceChart', figure.data, figure.layout);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
